@@ -1,0 +1,17 @@
+
+div.goal{
+    display:  flex;
+}
+div.contatiner {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 30px;
+    margin: 10px;
+}
+div.subContainer {
+    width: 50vw;
+    border: 3px solid olivedrab;
+    padding: 30px;
+    border-end-end-radius: 20px;
+}
