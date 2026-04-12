@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router';
 
+
+import StreakPage from './pages/streakPage';
 import TestPage from './pages/TestPage';
 import AddGoal from './pages/AddGoal';
+import {DataProvider} from './DataProvider'
 import './App.css'
 
 function App() {
-  
-  const [streak, setStreak] = useState(0);
   return (
+    <DataProvider>
     <BrowserRouter>
       <nav style={{ padding: '10px', gap: '20px', display: 'flex' }}>
         <Link to="/">Home</Link>
@@ -16,21 +18,13 @@ function App() {
         <Link to="/addgoal">Add a goal</Link>
       </nav>
       <Routes>
-        <Route path="/" element={
-          <div>
-            <h1>Your Streak</h1>
-            <h1>{streak}</h1>
-            
-             
-            
-          </div>
+        <Route path="/" element={<StreakPage/>
         } />
         <Route path="/test" element={<TestPage />} />
         <Route path="/addgoal" element={<AddGoal />} />
       </Routes>
     </BrowserRouter>
-
-
+</DataProvider>
   )
 }
 
