@@ -1,1 +1,16 @@
- 
+ nav {
+    background-color:rgb(16, 63, 63);
+    color: rgb(97, 255, 255);
+    justify-content: space-around;
+ }
+a {
+    color:rgb(58, 226, 43);
+    font-size: 20px;
+    
+}
+a:active {
+
+     transform: scale(0.8);
+  transition: transform 0.07s;
+
+}

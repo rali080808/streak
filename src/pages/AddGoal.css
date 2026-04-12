@@ -15,3 +15,12 @@ div.subContainer {
     padding: 30px;
     border-end-end-radius: 20px;
 }
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    
+}
+div.goal:active {
+    color:rgb(2, 180, 20);
+}
