@@ -22,3 +22,7 @@ belezhki.txt
 *.njsproj
 *.sln
 *.sw?
+
+# SQL skill
+.agents/
+skills-lock.json
