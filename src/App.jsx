@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router';
 
 
-import StreakPage from './pages/streakPage';
+import StreakPage from './pages/StreakPage';
 import TestPage from './pages/TestPage';
-import SupaBaseTest from './pages/SupaBaseTest';
 import AddGoal from './pages/AddGoal';
 import Completed from './pages/Completed'
 import Login from './pages/Login'
