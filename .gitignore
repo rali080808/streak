@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 belezhki.txt
+src/pages/SupaBaseTest.jsx
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
