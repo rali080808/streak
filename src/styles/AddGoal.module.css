@@ -1,0 +1,48 @@
+
+div.goal{
+    display:  flex;
+}
+div.goal.high {
+    color: red;   
+}
+div.goal.low {
+    color: rgb(4, 174, 168);   
+}
+div.goal.medium {
+    color: blue;   
+}
+div.container {
+    display: flex;
+    flex-direction: row;
+    justify-content:center;
+   width:100vw;
+    margin: 10px;
+}
+div.subContainer {
+    width: 80vw;
+    padding: 30px;
+    border-end-end-radius: 20px;
+}
+div.subContainer.goals {
+    border-left: 7px solid rgb(127, 4, 180);
+}
+div.subContainer.completed {
+    border-left: 7px solid olivedrab;
+}
+ 
+div.goal:active {
+    color:rgb(2, 180, 20);
+}
+div.addGoal {
+     height: 5vh; 
+}
+button.addGoal, input.addGoal, select.addGoal {
+    width:auto;
+    height: 5vh;
+   height:inherit;
+    font-size: 16px; 
+}
+button.addGoal {
+    border: 3px solid rgb(104, 52, 122);
+    background-color: rgb(255, 241, 255);
+}

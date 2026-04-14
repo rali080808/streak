@@ -1,0 +1,48 @@
+div.container {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 30px;
+}
+select {
+    font-size: 30px;
+    border-width: 0px;
+    text-align: center;
+   
+}
+input {
+    font-size: large;
+}
+label {
+    margin-top:40px;
+}
+select, input, label {
+    width: 40vw;
+    height: 8vh;
+    margin: 3px;
+}
+button {
+    font-size: 23px;
+    font-weight: 700;
+    width: 40vw;
+    height: 10vh;
+    margin: 10px
+}
+button.Login {
+    border-color: green;
+    color:green;
+    border-style: groove;
+    border-width: 5px;;
+    background-color: rgb(178, 238, 119);
+}
+button.Signup {
+     border-color: rgb(0, 43, 128);
+    border-style:outset;
+    border-width: 5px;;
+    background-color: rgb(160, 201, 255);
+}
+button:active {
+    transform: scale(0.8);
+    transition: transform 1.2 ease-in;
+}
