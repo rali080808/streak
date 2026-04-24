@@ -4,27 +4,19 @@ import styles from '../styles/AddGoal.module.css';
 
 
 import Login from './Login'
+import Goal from './Goal'
 import { createClient } from "@supabase/supabase-js";
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
 
 function AddGoal() {
-    const { goals, setGoals, userID, isLoggedIn } = useContext(DataContext);
+    const { goals, setGoals, userID, isLoggedIn, fetchGoals } = useContext(DataContext);
 
     let [buttonVisible, setButtonVisible] = useState(true);
     let [newGoal, setNewGoal] = useState({
         name: "newGoal", endDate: new Date(0, 0, 0), importance: "low", user_id: userID
 
     });
-    async function fetchGoals() {
-        const { data, error } = await supabase
-            .from("goals")
-            .select("*")
-            .eq("user_id", userID)
-            .eq("completed", false);
-        if (error) console.log(error)
-        console.log(data)
-        return data;
-    }
+ 
     useEffect(() => {
         let sorted = [...goals].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
         if (JSON.stringify(sorted) !== JSON.stringify(goals))
@@ -68,9 +60,7 @@ function AddGoal() {
             <div className={`${styles.subContainer} ${styles.goals}`}>
 
                 {goals.map((val, index) => {
-                    return (!val.completed && <div className={`${styles.goal} ${styles[val.importance]}`} key={index} onClick={() => checkGoal(index)} >
-                        <h4> {new Date(val.endDate).toLocaleDateString()} - {val.name} </h4>
-                    </div>)
+                    return <Goal goal={val} index={index} key={index} onClick={() => checkGoal(index)}  />  
                 })}
                 {buttonVisible &&
                     <button className={styles.addGoal} onClick={() => setButtonVisible(false)}> Add a goal </button>}
