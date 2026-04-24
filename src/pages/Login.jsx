@@ -10,12 +10,7 @@ function Login() {
     let [loginType, setLoginType] = useState("Login")
 
     async function login() {
-        /**
-         * TODO no hardcoded values
-         * check loginType
-         * email field for SignUp
-         * user must login after signup
-         */
+      
         if (loginType === "Login") {
 
             const { data, error } = await supabase.auth.signInWithPassword({
@@ -25,7 +20,7 @@ function Login() {
             });
 
             if (error) {
-                console.error("Login failed:", error);
+                alert("Login failed: " + error);
             } else {
                 alert("Logged in")
 
@@ -51,17 +46,28 @@ function Login() {
                 console.log(data)
                 console.log("username stored:", data.user?.user_metadata?.display_name)
                 setUsername(data.user?.user_metadata?.display_name);
-                if (data.user?.identities?.length === 0) {
-                    alert("User already exists! Loggging in instead...");
-                } else {
-                    const { _, __ } = await supabase.auth.signInWithPassword({
-                        email: username + "@fakeemail.com",
-                        password: password
-                    });
-                    alert("Logged in");
-                    setIsLoggedIn(true)
-                }
 
+                const { _, __ } = await supabase.auth.signInWithPassword({
+                    email: username + "@fakeemail.com",
+                    password: password
+                });
+                alert("Logged in");
+                setIsLoggedIn(true)
+
+                const result = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            user_id: data.user.id,
+                            streak: 0,
+                            lastStreakUpdate: null
+                        }
+                    ])
+                    .select();
+//                 if (errorr) {
+//     console.error("Error details:", errorr.message, errorr.details, errorr.hint)
+// }
+                 console.log("Data from insertion into profiles: ", result.data)
 
             }
         }
