@@ -22,7 +22,7 @@ function Login() {
             if (error) {
                 alert("Login failed: " + error);
             } else {
-                alert("Logged in")
+               // alert("Logged in")
 
                 setUserID(data.user.id);
                 setIsLoggedIn(true)

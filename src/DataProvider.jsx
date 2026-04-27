@@ -16,7 +16,7 @@ export function DataProvider({ children }) {
     ]);
 
     const [streak, setStreak] = useState(0);
-    let [lastStreakUpdate, setLastStreakUpdate] = useState(new Date(Date.now() - 7*24*60*60*1000).toDateString() );
+    let [lastStreakUpdate, setLastStreakUpdate] = useState(new Date(Date.now() - 7*24*60*60*1000) );
      async function fetchGoals() {
           const { data, error } = await supabase
               .from("goals")
