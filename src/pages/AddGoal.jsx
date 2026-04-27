@@ -32,12 +32,18 @@ function AddGoal() {
     if (!isLoggedIn) return <Login />;
 
     async function checkGoal(index) {
+   setGoals(prevGoals => prevGoals.map(goal => 
+        goal.id ===  goals[index].id 
+            ? { ...goal, completed: true, completeDate: new Date(Date.now()) }
+            : goal
+    ));
+
         const { data, error } = await supabase
             .from('goals')
             .update({ completed: true, completeDate: new Date(Date.now()) })
             .eq('id', goals[index].id);
         fetchGoals().then(data => {
-            if (data) setGoals(data);
+            
         });
     }
     async function addGoal() {
@@ -60,7 +66,7 @@ function AddGoal() {
             <div className={`${styles.subContainer} ${styles.goals}`}>
 
                 {goals.map((val, index) => {
-                    return <Goal goal={val} index={index} key={index} onClick={() => checkGoal(index)}  />  
+                    return <Goal goal={val} index={index} key={val.id} onClick={() => checkGoal(index)}  />  
                 })}
                 {buttonVisible &&
                     <button className={styles.addGoal} onClick={() => setButtonVisible(false)}> Add a goal </button>}
