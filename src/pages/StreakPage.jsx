@@ -8,7 +8,7 @@ const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env
 
 function StreakPage() {
     const { streak, setStreak, goals, lastStreakUpdate, setLastStreakUpdate, username, isLoggedIn, fetchGoals, setGoals, userID } = useContext(DataContext);
-    const STREAK_UPDATE_TIME = 0;
+    const STREAK_UPDATE_TIME = 23;
     if (!isLoggedIn) return <Login />;
     useEffect(() => {
         async function fetchStreak() {
