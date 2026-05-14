@@ -8,7 +8,7 @@ const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env
 
 function StreakPage() {
     const { streak, setStreak, goals, lastStreakUpdate, setLastStreakUpdate, username, isLoggedIn, fetchGoals, setGoals, userID } = useContext(DataContext);
-    const STREAK_UPDATE_TIME = 23;
+  
     if (!isLoggedIn) return <Login />;
     useEffect(() => {
         async function fetchStreak() {
@@ -24,7 +24,9 @@ function StreakPage() {
                 setStreak(data.streak)
                 return data
             }
-        } let today = new Date(Date.now());
+        } 
+        
+        let today = new Date(Date.now());
         /**
          * @param {Date} date
          * @returns {Date}
@@ -34,27 +36,43 @@ function StreakPage() {
         }
         async function updateStreak() {
             let yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-
+          
             const [streakData, goalsData] = await Promise.all([
                 fetchStreak(),
                 fetchGoals()
             ])
             let currentStreak = streakData.streak;
+            let currentLastStreakUpdate = streakData.lastStreakUpdate;
+            console.log(dateAtMidnight(new Date(streakData.lastStreakUpdate)))
+            console.log(dateAtMidnight(today))
+
             if (goalsData && dateAtMidnight(new Date(streakData.lastStreakUpdate)).valueOf() != dateAtMidnight(today).valueOf()) {
 
                 let sorted = [...goalsData].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
                 setGoals(sorted);
-
+                
+                
                 if (goals.length == 0 || new Date(goals[0].endDate).valueOf() > dateAtMidnight(today).valueOf()) {
-                    currentStreak = dateAtMidnight(new Date(streakData.lastStreakUpdate)).valueOf() == dateAtMidnight(yesterday).valueOf() ? currentStreak + 1 : 1
+                    if ( dateAtMidnight(new Date(streakData.lastStreakUpdate)).valueOf() == dateAtMidnight(yesterday).valueOf() ) {
+                        currentStreak = currentStreak+1
+                        currentLastStreakUpdate = today
+                         
+                    } else {
+                     currentStreak = 1
+                    currentLastStreakUpdate = today;
+
+                  }
                 } else {
                     currentStreak = 0
+                     currentLastStreakUpdate = today;
                 }
-                setLastStreakUpdate(today);
+
+                setLastStreakUpdate(currentLastStreakUpdate)
                 setStreak(currentStreak)
-                const { data, error } = await supabase
+                console.log(dateAtMidnight(new Date(Date.now())).toDateString())
+            const { data, error } = await supabase
                     .from("profiles")
-                    .update({ ...streakData, streak: currentStreak, lastStreakUpdate: dateAtMidnight(new Date(Date.now())).toDateString(), updateDate: new Date(Date.now()) })
+                    .update({ ...streakData, streak: currentStreak, lastStreakUpdate: currentLastStreakUpdate.toDateString(), updateDate: new Date(today.getFullYear(), today.getMonth(), today.getDate()).toDateString() })
                     .eq('user_id', userID)
                 if (error)
                     console.log("error from updating streak: ", error);
@@ -62,7 +80,7 @@ function StreakPage() {
                     console.log("no problems with updating streak data")
             }
         }
-        if (today.getHours() >= STREAK_UPDATE_TIME) updateStreak();
+      updateStreak();
 
     }, [isLoggedIn]);
 
@@ -70,8 +88,8 @@ function StreakPage() {
         <h3> Hello, {username}</h3>
         <h1>Your Streak</h1>
         <h1 >{streak}</h1>
-        <h2>Last Streak Update: {lastStreakUpdate ? lastStreakUpdate.toLocaleTimeString() : 'Loading...'}</h2>
-        <h2> STREAK_UPDATE_TIME: {STREAK_UPDATE_TIME}h </h2>
+        <h2>{new Date(lastStreakUpdate).toDateString()}</h2>
+        <h2> STREAK_UPDATE_TIME: {0}h </h2>
         <h2> Current time: {new Date(Date.now()).getHours()}h </h2>
     </div>) : (<Login />));
 }
