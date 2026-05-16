@@ -21,7 +21,7 @@ function StreakPage() {
                 console.log(error)
                 return null
             } else {
-                setStreak(data.streak)
+             //   setStreak(data.streak)
                 return data
             }
         } 
@@ -52,7 +52,7 @@ function StreakPage() {
                 setGoals(sorted);
                 
                 
-                if (goals.length == 0 || new Date(goals[0].endDate).valueOf() > dateAtMidnight(today).valueOf()) {
+                if (goals.length == 0 || new Date(sorted[0].endDate).valueOf() > dateAtMidnight(today).valueOf()) {
                     if ( dateAtMidnight(new Date(streakData.lastStreakUpdate)).valueOf() == dateAtMidnight(yesterday).valueOf() ) {
                         currentStreak = currentStreak+1
                         currentLastStreakUpdate = today
@@ -78,7 +78,7 @@ function StreakPage() {
                     console.log("error from updating streak: ", error);
                 else
                     console.log("no problems with updating streak data")
-            }
+            }else {setStreak(streakData.streak); setLastStreakUpdate(streakData.lastStreakUpdate)}
         }
       updateStreak();
 
