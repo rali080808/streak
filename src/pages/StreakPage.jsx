@@ -51,8 +51,8 @@ function StreakPage() {
                 let sorted = [...goalsData].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
                 setGoals(sorted);
                 
-                
-                if (goals.length == 0 || new Date(sorted[0].endDate).valueOf() > dateAtMidnight(today).valueOf()) {
+                console.log(goals.length )
+                if (sorted.length == 0 || new Date(sorted[0].endDate).valueOf() > dateAtMidnight(today).valueOf()) {
                     if ( dateAtMidnight(new Date(streakData.lastStreakUpdate)).valueOf() == dateAtMidnight(yesterday).valueOf() ) {
                         currentStreak = currentStreak+1
                         currentLastStreakUpdate = today
