@@ -1,6 +1,7 @@
 // Context.js
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import { createClient } from "@supabase/supabase-js";
+ import OneSignal from 'react-onesignal';
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
 
 export const DataContext = createContext();
@@ -23,6 +24,24 @@ export function DataProvider({ children }) {
           console.log(data)
           return data;
       }
+     
+
+ 
+  useEffect(() => {
+    // Ensure this code runs only on the client side
+    if (typeof window !== 'undefined') {
+      OneSignal.init({
+      
+      appId: "46e54a80-e9fe-4e26-b4b8-14ccf233e88b",
+      safari_web_id: "web.onesignal.auto.24e91fba-47ec-4183-a873-89e8fb838de6",
+  
+       allowLocalhostAsSecureOrigin: true, 
+        notifyButton: {
+          enable: true,
+        }
+      });
+    }
+  }, []);
     return (
         <DataContext.Provider value={{
             goals,
