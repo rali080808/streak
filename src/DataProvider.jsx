@@ -33,7 +33,7 @@ export function DataProvider({ children }) {
     if (typeof window !== 'undefined') {
       OneSignal.init({
       
-      appId: import.meta.env.ONESIGNAL_APP_ID,
+      appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
      // safari_web_id: "something",
   
        allowLocalhostAsSecureOrigin: false, 
