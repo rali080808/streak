@@ -1,28 +1,15 @@
 # Streak
 
-A habit / goal tracking web app. You add goals with a deadline, tick them off as
-you finish them, and keep a daily streak going for as long as you never let a
-goal run past its due date. Push notifications nudge you once a day.
+A habit / goal tracking web app. Add goals with a deadline, tick them off as you
+finish them, and keep a daily streak alive for as long as you never let a goal
+run past its due date. A push notification nudges you once a day.
 
-Built with React + Vite, Supabase (Postgres, auth, edge functionsand OneSignal,
-deployed on Netlify.
+React + Vite, Supabase (Postgres, auth, edge functions), OneSignal for push,
+hosted on Netlify.
 
-## Status
-
-Under active development. Working today: signup/login, adding and completing
-goals, the completed list, streak calculation and daily push notifications.
-Friend comparisons and a leaderboard are still just ideas.
-
-## Tech stack
-
-| Piece | What it does |
-| --- | --- |
-| React 19 + React Router 7 | UI and client-side routing |
-| Vite 8 | Dev server and build |
-| Supabase JS | Auth plus the `profiles` and `goals` tables |
-| Supabase Edge Functions (Deno) | Server-side triggers for push notifications |
-| OneSignal (`react-onesignal`) | Web push, including the service worker |
-| Netlify | Hosting, auto-deploys from the `production` branch |
+Working today: signup/login, adding and completing goals, the completed list,
+streak calculation, daily push. Friend comparisons and a leaderboard are still
+just ideas.
 
 ## Getting started
 
@@ -31,118 +18,73 @@ npm install
 npm run dev
 ```
 
-Create a `.env.local` in the project root first — the app reads these at build
-time and will fail to reach Supabase without them:
+Needs a `.env.local` in the project root:
 
 ```
 VITE_SUPABASE_URL=https://<your-project>.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=<your supabase publishable / anon key>
-VITE_ONESIGNAL_APP_ID=<your onesignal app id>
+VITE_SUPABASE_PUBLISHABLE_KEY=<supabase publishable / anon key>
+VITE_ONESIGNAL_APP_ID=<onesignal app id>
 ```
 
-Scripts:
-
-- `npm run dev` — dev server (bound to `0.0.0.0`, so you can open it from your
-  phone on the same network — useful for testing push)
-- `npm run build` — production build into `dist/`
-- `npm run preview` — serve the production build locally
-- `npm run lint` — ESLint
-
-Note that OneSignal is initialised with `allowLocalhostAsSecureOrigin: false`,
-so push prompts only show up on the deployed HTTPS site, not on `localhost`.
+`dev` / `build` / `preview` / `lint`. The dev server binds to `0.0.0.0` so you
+can open it from your phone. Push prompts only appear on the deployed HTTPS
+site — OneSignal is initialised with `allowLocalhostAsSecureOrigin: false`.
 
 ## How it works
 
-### Routes
-
 | Path | Page | Purpose |
 | --- | --- | --- |
-| `/` | `StreakPage` | Greeting, current streak, last update date |
-| `/addgoal` | `AddGoal` | List of open goals, form to add one, tap a goal to complete it |
+| `/` | `StreakPage` | Current streak and last update date |
+| `/addgoal` | `AddGoal` | Open goals, form to add one, tap a goal to complete it |
 | `/completed` | `Completed` | Finished goals, newest first |
-| `/login` | `Login` | One form that toggles between sign up and log in |
+| `/login` | `Login` | One form toggling between sign up and log in |
 
 Every page renders `Login` instead of itself when you are not signed in.
+[`src/DataProvider.jsx`](src/DataProvider.jsx) holds all shared state in one
+context: session, goals, streak, `fetchGoals()`.
 
-### State
+**Auth.** Username + password, no real email — the username becomes
+`<username>@fakeemail.com` before it reaches Supabase auth, and the display name
+lives in user metadata. Signing up also inserts a row into `profiles`.
 
-[`src/DataProvider.jsx`](src/DataProvider.jsxholds a single React context with
-the session (`isLoggedIn`, `userID`, `username`), the goal list, the streak, and
-`fetchGoals()`. It also initialises OneSignal once on mount.
+**Streak rules**, computed once per day on load in
+[`src/pages/StreakPage.jsx`](src/pages/StreakPage.jsx), comparing dates at local
+midnight:
 
-### Auth
+- already updated today → nothing changes
+- nothing overdue, last update was yesterday → streak + 1
+- nothing overdue, older than that → streak resets to 1
+- any goal past its deadline → streak drops to 0
 
-Accounts are username + password. There is no real email address involved — the
-username is turned into `<username>@fakeemail.com` before being handed to
-`supabase.auth.signUp` / `signInWithPassword`, and the display name is kept in
-user metadata. Signing up also inserts a matching row into `profiles`.
+**Tables.** `profiles` (`user_id`, `streak`, `lastStreakUpdate`, `updateDate`)
+and `goals` (`id`, `user_id`, `name`, `endDate`, `importance` low/medium/high,
+`completed`, `completeDate`).
 
-### Streak rules
+## Notifications
 
-Computed in [`src/pages/StreakPage.jsx`](src/pages/StreakPage.jsx), once per day
-on load. All comparisons are done at local midnight.
+OneSignal delivers the push, but none of the scheduling is its own — a cron-job.org
+job pings a Supabase edge function on a timer:
 
-- Already updated today → nothing happens, the stored values are shown.
-- No goals are overdue (the earliest deadline is still in the future):
-  - last update was yesterday → streak + 1
-  - otherwise → streak resets to 1, a fresh start
-- At least one goal is past its deadline → streak drops to 0.
+**cron-job.org -> edge function -> OneSignal REST API -> push**
 
-The new value is written back to `profiles` along with `lastStreakUpdate`.
+Three functions in [`supabase/functions/`](supabase/functions/):
 
-### Data model
+- `customScheduledNotification` — **the live one**, called by the cron job for
+  the 9 AM reminder. Answers GET (so a plain ping works) and POST, with an
+  optional `{ heading, message, segment }` body.
+- `customNotification` — manual one-off, POST `{ title, message }`.
+- `fixedScheduleNotification` — earlier attempt that let OneSignal do the timing
+  (`delayed_option: "timezone"`). Superseded, kept for reference.
 
-Two tables in Supabase:
-
-**`profiles`** — `user_id`, `streak`, `lastStreakUpdate`, `updateDate`
-
-**`goals`** — `id`, `user_id`, `name`, `endDate`, `importance` (`low` /
-`medium` / `high`, which drives the card colour), `completed`, `completeDate`
-
-### Notifications
-
-The service worker lives at [`public/OneSignalSDKWorker.js`](public/OneSignalSDKWorker.js)
-and must stay at the site root to be allowed to control the whole scope.
-
-Three edge functions in [`supabase/functions/`](supabase/functions/) talk to the
-OneSignal REST API:
-
-- `customNotification` — POST `{ title, message }`, sends it to everyone
-- `customScheduledNotification` — the daily 9 AM reminder; accepts an optional
-  `{ heading, message, segment }` body, has sensible defaults, and handles CORS
-  so it can also be poked from the browser
-- `fixedScheduleNotification` — queues the fixed 9:30 AM / 6:30 PM pair,
-  delivered in each user's own timezone
-
-They read `ONESIGNAL_APP_ID` and `ONESIGNAL_REST_API_KEY` (older two read
-`APP_ID` / `API_KEY`) from Supabase secrets:
+The live one reads `ONESIGNAL_APP_ID` and `ONESIGNAL_REST_API_KEY` from Supabase
+secrets; the older two read `APP_ID` / `API_KEY`.
 
 ```bash
 npx supabase secrets set ONESIGNAL_APP_ID="..."
-npx supabase secrets set ONESIGNAL_REST_API_KEY="..."
 npx supabase functions deploy customScheduledNotification
 ```
 
 ## Deploying
 
-Work on `local-dev`, merge into `production` when it is ready — Netlify watches
-`production` and deploys on push.
-
-```bash
-git checkout local-dev
-# ...commit your work, push it...
-git checkout production
-git merge local-dev
-git push origin production
-git checkout local-dev
-```
-
-## Known rough edges
-
-- The streak is only recalculated when `/` is opened, so it can lag behind if
-  you never visit the home page.
-- A lost streak is only written to Supabase on that next visit.
-- No personal-best streak is recorded yet.
-- Goals cannot be edited or deleted once added, only completed.
-- The Supabase client is constructed separately in each page instead of being
-  shared from one module.
+Work on `local-dev`, merge into `production` — Netlify watches `production` and
+deploys on push.
