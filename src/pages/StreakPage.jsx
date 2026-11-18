@@ -52,7 +52,7 @@ function StreakPage() {
                 setGoals(sorted);
                 
                 console.log(goals.length )
-                if (sorted.length == 0 || new Date(sorted[0].endDate).valueOf() > dateAtMidnight(today).valueOf()) {
+                if (sorted.length == 0 || new Date(sorted[0].endDate).valueOf() >= dateAtMidnight(today).valueOf()) {
                     if ( dateAtMidnight(new Date(streakData.lastStreakUpdate)).valueOf() == dateAtMidnight(yesterday).valueOf() ) {
                         currentStreak = currentStreak+1
                         currentLastStreakUpdate = today

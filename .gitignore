@@ -27,3 +27,5 @@ src/pages/SupaBaseTest.jsx
 # SQL skill
 .agents/
 skills-lock.json
+
+supabase/.temp/
